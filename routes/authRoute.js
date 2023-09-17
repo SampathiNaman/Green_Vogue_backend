@@ -27,6 +27,9 @@ const {
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const router = express.Router();
+
+//get , post , put, delete
+//localhost:5000/api/user/register
 router.post("/register", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
 
