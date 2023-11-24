@@ -8,12 +8,12 @@ var productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
+    // slug: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    //   lowercase: true,
+    // },
     description: {
       type: String,
       required: true,
@@ -38,21 +38,18 @@ var productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    images: [
-      {
-        public_id: String,
-        url: String,
-      },
-    ],
+    images: {
+      type: Array
+    },
     color: [],
     tags: String,
-    ratings: [
-      {
-        star: Number,
-        comment: String,
-        postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-      },
-    ],
+    // ratings: [
+    //   {
+    //     star: Number,
+    //     comment: String,
+    //     postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    //   },
+    // ],
     totalrating: {
       type: String,
       default: 0,

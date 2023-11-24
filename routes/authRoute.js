@@ -30,7 +30,7 @@ const router = express.Router();
 
 //get , post , put, delete
 //localhost:5000/api/user/register
-router.post("/register", createUser);
+router.post("/signup", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
 
 router.put("/reset-password/:token", resetPassword);
