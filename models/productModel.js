@@ -8,12 +8,12 @@ var productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    // slug: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    //   lowercase: true,
-    // },
+    slug: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
     description: {
       type: String,
       required: true,
@@ -38,11 +38,9 @@ var productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    images: {
-      type: Array
-    },
-    color: [],
-    tags: String,
+    images: [],
+    // color: [],
+    // tags: String,
     // ratings: [
     //   {
     //     star: Number,
