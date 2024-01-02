@@ -15,6 +15,7 @@ const {
   resetPassword,
   loginAdmin,
   getWishlist,
+  addWishlist,
   saveAddress,
   userCart,
   getUserCart,
@@ -30,9 +31,8 @@ const router = express.Router();
 
 //get , post , put, delete
 //localhost:5000/api/user/register
-router.post("/register", createUser);
+router.post("/signup", createUser);
 router.post("/forgot-password-token", forgotPasswordToken);
-
 router.put("/reset-password/:token", resetPassword);
 
 router.put("/password", authMiddleware, updatePassword);
@@ -48,6 +48,7 @@ router.post("/getorderbyuser/:id", authMiddleware, isAdmin, getAllOrders);
 router.get("/refresh", handleRefreshToken);
 router.get("/logout", logout);
 router.get("/wishlist", authMiddleware, getWishlist);
+router.post("/wishlist", authMiddleware, addWishlist);
 router.get("/cart", authMiddleware, getUserCart);
 
 router.get("/:id", authMiddleware, isAdmin, getaUser);

@@ -4,7 +4,7 @@ const dbConnect = require("./config/dbConnect");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const app = express();
 const dotenv = require("dotenv").config();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const authRouter = require("./routes/authRoute");
 const productRouter = require("./routes/productRoute");
 const blogRouter = require("./routes/blogRoute");
@@ -21,10 +21,24 @@ const cors = require("cors");
 
 dbConnect();
 app.use(morgan("dev"));
-app.use(cors());
+
+app.use(cors({
+  origin: ["http://localhost:3000"]
+}));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// app.use((req,res,next)=>{
+//   res.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
+//   res.setHeader("Access-Control-Allow-Credentials",true);
+//   res.setHeader("Access-Control-Allow-Origin","*");
+//   res.setHeader("Access-Control-Allow-Methods","GET,POST,PUT,DELETE");
+//   res.setHeader("Access-Control-Allow-Headers","*");
+//   next();
+// })
+
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);

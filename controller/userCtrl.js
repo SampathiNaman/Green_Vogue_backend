@@ -59,12 +59,12 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     });
     res.json({
       _id: findUser?._id,
-      firstname: findUser?.firstname,
-      lastname: findUser?.lastname,
+      name: findUser?.name,
       email: findUser?.email,
-      mobile: findUser?.mobile,
+      role: findUser?.role,
       token: generateToken(findUser?._id),
     });
+
   } else {
     throw new Error("Invalid Credentials");
   }
@@ -92,8 +92,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
     });
     res.json({
       _id: findAdmin?._id,
-      firstname: findAdmin?.firstname,
-      lastname: findAdmin?.lastname,
+      name: findAdmin?.name,
       email: findAdmin?.email,
       mobile: findAdmin?.mobile,
       token: generateToken(findAdmin?._id),
@@ -154,8 +153,7 @@ const updatedUser = asyncHandler(async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       _id,
       {
-        firstname: req?.body?.firstname,
-        lastname: req?.body?.lastname,
+        name: req?.body?.name,
         email: req?.body?.email,
         mobile: req?.body?.mobile,
       },
@@ -330,44 +328,69 @@ const resetPassword = asyncHandler(async (req, res) => {
 const getWishlist = asyncHandler(async (req, res) => {
   const { _id } = req.user;
   try {
-    const findUser = await User.findById(_id).populate("wishlist");
-    res.json(findUser);
+    const wishlist = await User.findById(_id).populate("wishlist");
+    res.json(wishlist);
   } catch (error) {
     throw new Error(error);
   }
 });
 
-const userCart = asyncHandler(async (req, res) => {
-  const { cart } = req.body;
+const addWishlist = asyncHandler(async (req, res) => {
+  const {wishlist} = req.body;
   const { _id } = req.user;
   validateMongoDbId(_id);
   try {
-    let products = [];
+    const findUser = await User.findById(_id);
+    const updatedUser = await User.findByIdAndUpdate({_id: findUser?._id},{
+      wishlist: wishlist
+    })
+    res.send(updatedUser);
+  }
+  catch(error) {
+    throw new Error(error);
+  }
+})
+
+const userCart = asyncHandler(async (req, res) => {
+  const { cart, count, cartTotal } = req.body;
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+
     const user = await User.findById(_id);
     // check if user already have product in cart
     const alreadyExistCart = await Cart.findOne({ orderby: user._id });
     if (alreadyExistCart) {
       alreadyExistCart.remove();
     }
+    let products = [];    
     for (let i = 0; i < cart.length; i++) {
       let object = {};
       object.product = cart[i]._id;
-      object.count = cart[i].count;
-      object.color = cart[i].color;
-      let getPrice = await Product.findById(cart[i]._id).select("price").exec();
-      object.price = getPrice.price;
+      object.count = count[i];
+      // let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+      object.price = cart[i].price*count[i];
       products.push(object);
     }
-    let cartTotal = 0;
-    for (let i = 0; i < products.length; i++) {
-      cartTotal = cartTotal + products[i].price * products[i].count;
-    }
+
+    // let cartTotal = 0;
+    // for (let i = 0; i < products.length; i++) {
+    //   cartTotal = cartTotal + products[i].price * products[i].count;
+    // }
+
     let newCart = await new Cart({
       products,
       cartTotal,
       orderby: user?._id,
     }).save();
+    console.log(cart, count, cartTotal ,newCart)
+    await User.findByIdAndUpdate({
+      _id: user?._id,
+    }, {
+      cart: newCart._id,
+    });
     res.json(newCart);
+
   } catch (error) {
     throw new Error(error);
   }
@@ -379,7 +402,7 @@ const getUserCart = asyncHandler(async (req, res) => {
   try {
     const cart = await Cart.findOne({ orderby: _id }).populate(
       "products.product"
-    );
+    )
     res.json(cart);
   } catch (error) {
     throw new Error(error);
@@ -445,7 +468,7 @@ const createOrder = asyncHandler(async (req, res) => {
         amount: finalAmout,
         status: "Cash on Delivery",
         created: Date.now(),
-        currency: "usd",
+        currency: "inr",
       },
       orderby: user._id,
       orderStatus: "Cash on Delivery",
@@ -540,6 +563,7 @@ module.exports = {
   resetPassword,
   loginAdmin,
   getWishlist,
+  addWishlist,
   saveAddress,
   userCart,
   getUserCart,
